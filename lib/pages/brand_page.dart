@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:slad_app/providers/telescope_provider.dart';
+import 'package:slad_app/utils/widget_functions.dart';
 
 class BrandPage extends StatelessWidget {
   static const String routeName = 'brand';
@@ -13,9 +15,28 @@ class BrandPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Brand'),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showSingletextInputDialog(
+              context: context,
+              title: 'Add Brand',
+              onSubmit: (value) {
+                EasyLoading.show(status: 'Please Wait');
+                Provider.of<TelescopeProvider>(context, listen: false)
+                    .addBrand(value)
+                    .then((value) {
+                  EasyLoading.dismiss();
+                  showMsg(context, 'Brand Added');
+                });
+              });
+        },
+        child: const Icon(Icons.add),
+      ),
       body: Consumer<TelescopeProvider>(
         builder: (context, provider, child) => provider.brandList.isEmpty
-            ? const Center(child: Text('No Brand Found'),)
+            ? const Center(
+                child: Text('No Brand Found'),
+              )
             : ListView.builder(
                 itemCount: provider.brandList.length,
                 itemBuilder: (context, index) {
@@ -27,3 +48,5 @@ class BrandPage extends StatelessWidget {
     );
   }
 }
+
+showMsg(BuildContext context, String msg) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
