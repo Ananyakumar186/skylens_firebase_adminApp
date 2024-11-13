@@ -1,4 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
+import 'package:slad_app/auth/auth_service.dart';
+import 'package:slad_app/pages/dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
   static const String routeName = '/login';
@@ -84,6 +89,28 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _authenticate() {
+  void _authenticate() async {
+    if(_formKey.currentState!.validate()) {
+      EasyLoading.show(status: 'Please wait...');
+      final email = _emailController.text;
+      final pass = _passwordController.text;
+      try {
+        final status = await AuthService.loginAdmin(email, pass);
+        EasyLoading.dismiss();
+        if(status){
+          context.goNamed(DashboardPage.routeName);
+        }else{
+          await AuthService.logout();
+          setState(() {
+            _errMsg = 'This is not an Admin account';
+          });
+        }
+      } on FirebaseAuthException catch(error) {
+        EasyLoading.dismiss();
+        setState(() {
+          _errMsg = error.message!;
+        });
+      }
+    }
   }
 }
