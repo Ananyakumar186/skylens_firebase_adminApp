@@ -1,3 +1,4 @@
+
 const String collectionBrand = 'Brands';
 const String brandFieldId = 'id';
 const String brandFieldName = 'name';
@@ -7,14 +8,14 @@ class Brand {
 
   Brand({this.id, required this.name});
 
-  Map<String,dynamic> toMap() {
+  Map<String,dynamic> toJson() {
     return <String,dynamic> {
       'id': id,
       'name': name
     };
   }
 
-  factory Brand.fromMap(Map<String,dynamic> map) => Brand(
+  factory Brand.fromJson(Map<String,dynamic> map) => Brand(
     id: map[brandFieldId],
     name: map[brandFieldName]
   );
