@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:go_router/go_router.dart';
@@ -11,9 +13,22 @@ import 'package:slad_app/pages/login_page.dart';
 import 'package:slad_app/pages/view_telescope_page.dart';
 import 'package:slad_app/providers/telescope_provider.dart';
 import 'package:provider/provider.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  if(message.notification != null) {
+    print("You have a notification: ${message.notification!.title}");
+  }
+  print("Data: ${message.data}");
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await FirebaseMessaging.instance.subscribeToTopic('order');
   runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => TelescopeProvider()),
